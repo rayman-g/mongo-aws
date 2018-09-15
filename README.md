@@ -1,6 +1,8 @@
 # Mongodb cluster deployment using terraform
 
+
 This HOWTO covers automated creation of AWS instances for 3-node MongoDB clusters such as security groups, instances creation and Route53 records. 
+
 
 # Requirements for setup
   - Tools used terraform, docker and docker-compose.
@@ -9,12 +11,9 @@ This HOWTO covers automated creation of AWS instances for 3-node MongoDB cluster
   - Key Pair "{your iam user}.pem" if you don't have please create.
   - Access rights to create EC2 instances, Security Groups, Route53 Records, EBS Volumes etc.
 
-### Preparation
 
-Clone this  github repository with a code and follow HOWTO!
+### Preparation 
 
-
-### Installation
 
 Terraform installation for linux machine 
 
@@ -28,6 +27,7 @@ Terraform v0.11.6
 Your version of Terraform is out of date! The latest version
 is 0.11.8. You can update by downloading from www.terraform.io/downloads.html
 ```
+
 
 Initialize Terraform plugin used in deployment
 
@@ -44,7 +44,10 @@ Terraform has been successfully initialized!
 ```
 
 ### Configure AWS variables 
+
+
 terraform.tfvars - holds sensitive information such as AWS access keys, VPC id's
+
 ```sh
 cat terraform.tfvars
 access_key="XXXXXXXXXXXXXXXXXXXX"
@@ -59,7 +62,10 @@ hosted_zoneid="Z3ANYTDAKQQQS"
 # Number of instances to create
 count_instances=3
 ```
+
+
 variables.tf - holds general information such as types of instances, tag names, AMI's etc
+
 ```sh
 cat variables.tf
 variable "access_key" {}
@@ -115,9 +121,13 @@ variable "users" {
 ```
 
 # Repository folder sturcture 
+
+
 prepareenv - copied to ec2 instances to provision them intall docker, docker-compose and build and start mongodb containers
 files - used for docker build 
 templates - user-data script to format fs on a additional EBS volume
+
+
 ```sh
 ├── main.tf
 ├── prepareenv
@@ -134,7 +144,10 @@ templates - user-data script to format fs on a additional EBS volume
 ```
 
 ### To change Mongodb Version
+
+
 You can adjust version in files/mongodb-org-3.4.repo 
+
 ```sh
 files/mongodb-org-3.4.repo 
 [mongodb-org-3.4]
@@ -147,7 +160,9 @@ gpgkey=https://www.mongodb.org/static/pgp/server-3.4.asc
 
 ### Mongodb Dockerfile and Compose
 
+
 Dockerfile
+
 ```sh
 prepareenv/Dockerfile 
 FROM centos:centos7
@@ -156,7 +171,10 @@ RUN yum -y update; yum clean all
 RUN yum install mongodb-org -y; yum clean all
 EXPOSE 27017
 ```
+
+
 Docker compose
+
 ```sh
 prepareenv/docker-compose.yml 
 version: '2'
@@ -175,6 +193,7 @@ services:
 
 ### Deployment
 
+
 Verify your deployment plan 
 ```sh
 $ ./terraform plan
@@ -182,7 +201,10 @@ Plan: 7 to add, 0 to change, 0 to destroy.
 ------------------------------------------------------------------------
 ```
 
+
 Execute deployment, this will create EC2 intances, install docker, build and start Mongodb containers
+
+
 ```sh
 $ ./terraform apply -auto-approve
 ...
@@ -194,6 +216,7 @@ Outputs:
 private_ip_mongodb = 10.124.43.61, 10.124.43.98, 10.124.43.108
 route53_records_mongodb = mongodb0.us-east-1.test.net, mongodb1.us-east-1.test.net, mongodb2.us-east-1.test.net
 ```
+
 
 You can check on a instance that docker compose build image and started mongodb container for three EC2 instances
 
@@ -217,9 +240,12 @@ WiredTigerLog.0000000001  WiredTigerPreplog.0000000001  WiredTigerPreplog.000000
 mongodb.log 
 ```
 
+
 ### Verify your Mongdb Cluster
 
+
 Enale replicaset 
+
 ```sh
 $ mongo --host mongodb1.us-east-1.test.net --port 27017
 rs.initiate(
@@ -236,7 +262,9 @@ rs.initiate(
 { "ok" : 1 }
 ```
 
+
 Verify configuration 
+
 ```sh
 rs01:SECONDARY> rs.conf()
 {
@@ -314,7 +342,9 @@ port   0.000GB
 ```
 
 ### Destroy Cluster
+
 If you don't need Mongodb cluster anymore, destroy it
+
 ```sh
 $ ./terraform destroy -auto-approve
 aws_instance.mongodb.1: Still destroying... (ID: i-01e7bb5eea23edfe3, 1m10s elapsed)
