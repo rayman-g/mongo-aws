@@ -1,0 +1,12 @@
+version: '2'
+services:
+  mongodb:
+    build: .
+    ports:
+      - "27017:27017"
+    volumes:
+       - /data/db:/data/db
+       - /data/log:/data/log
+    command: mongod --replSet rs01 --logpath "/data/log/mongodb.log" --dbpath /data/db --port 27017
+    restart: always
+
