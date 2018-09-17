@@ -18,7 +18,8 @@ This HOWTO covers automated creation of AWS instances for 3-node MongoDB cluster
 Terraform installation for linux machine 
 
 ```sh
-$ cd mongo-cluster-depoyment
+$ git clone https://github.com/rayman-g/mongo-aws.git
+$ cd mongo-aws
 $ curl -O https://releases.hashicorp.com/terraform/0.11.6/terraform_0.11.6_linux_amd64.zip
 $ unzip terraform_0.11.6_linux_amd64.zip 
 $ ./terraform  --version
